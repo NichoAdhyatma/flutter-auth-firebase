@@ -17,7 +17,7 @@ class AddProductPage extends StatelessWidget {
       Provider.of<Products>(context, listen: false)
           .addProduct(title, price)
           .then(
-            (value) => Navigator.of(context).pop(),
+            (_) => Navigator.of(context).pop(),
           )
           .catchError(
             (onError) => showDialog(

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_auth/providers/auth.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:provider/provider.dart';
-import './home_page.dart';
 
 const users = {
   'dribbble@gmail.com': '12345',
@@ -65,9 +64,7 @@ class _AuthPageState extends State<AuthPage> {
       onLogin: _authUser,
       onSignup: _signupUser,
       onSubmitAnimationCompleted: () {
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => const HomePage(),
-        ));
+        Provider.of<AuthProvider>(context, listen: false).tempData();
       },
       onRecoverPassword: _recoverPassword,
     );

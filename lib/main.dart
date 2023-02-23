@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/pages/auth_page.dart';
+import 'package:flutter_auth/pages/home_page.dart';
 import 'package:flutter_auth/providers/auth.dart';
 import 'package:provider/provider.dart';
 
@@ -20,19 +21,24 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => Products(),
-        ),
-        ChangeNotifierProvider(
           create: (context) => AuthProvider(),
         ),
+        ChangeNotifierProxyProvider<AuthProvider, Products>(
+          create: (context) => Products(),
+          update: (context, auth, product) {
+            return product!..getToken(auth.token);
+          },
+        ),
       ],
-      builder: (context, child) => MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: const AuthPage(),
-        routes: {
-          AddProductPage.route: (ctx) => AddProductPage(),
-          EditProductPage.route: (ctx) => const EditProductPage(),
-        },
+      builder: (context, child) => Consumer<AuthProvider>(
+        builder: (context, auth, child) => MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: auth.isAuth ? const HomePage() : const AuthPage(),
+          routes: {
+            AddProductPage.route: (ctx) => AddProductPage(),
+            EditProductPage.route: (ctx) => const EditProductPage(),
+          },
+        ),
       ),
     );
   }
