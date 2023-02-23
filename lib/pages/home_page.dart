@@ -23,7 +23,7 @@ class _HomePageState extends State<HomePage> {
   void didChangeDependencies() {
     if (isInit) {
       isLoading = true;
-      Provider.of<Products>(context, listen: false).inisialData().then((value) {
+      Provider.of<Products>(context, listen: false).inisialData().then((_) {
         setState(() {
           isLoading = false;
         });
@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> {
             builder: (context) {
               return AlertDialog(
                 title: const Text("Error Occured"),
-                content: Text(err.toString()),
+                content: Text("Error is $err"),
                 actions: [
                   TextButton(
                     onPressed: () {

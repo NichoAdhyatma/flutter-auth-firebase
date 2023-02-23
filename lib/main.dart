@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/pages/auth_page.dart';
+import 'package:flutter_auth/providers/auth.dart';
 import 'package:provider/provider.dart';
 
 import './providers/products.dart';
@@ -16,8 +17,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (ctx) => Products(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => Products(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => AuthProvider(),
+        ),
+      ],
       builder: (context, child) => MaterialApp(
         debugShowCheckedModeBanner: false,
         home: const AuthPage(),
