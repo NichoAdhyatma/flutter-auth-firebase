@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class AuthProvider with ChangeNotifier {
-  void signUp(String email, String password) async {
+  Future<void> signUp(String email, String password) async {
     Uri url = Uri.parse(
         "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCBCcz_adtPMnOEiJT2QsCjYAh4dfIGSRQ");
 
@@ -21,13 +21,16 @@ class AuthProvider with ChangeNotifier {
         ),
       );
 
-      print(json.decode(response.body));
+      var responseData = json.decode(response.body);
+      if (responseData["error"] != null) {
+        throw responseData["error"]["message"];
+      }
     } catch (err) {
       rethrow;
     }
   }
 
-  void signIn(String email, String password) async {
+  Future<void> signIn(String email, String password) async {
     Uri url = Uri.parse(
         "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyCBCcz_adtPMnOEiJT2QsCjYAh4dfIGSRQ");
 
@@ -44,7 +47,10 @@ class AuthProvider with ChangeNotifier {
         ),
       );
 
-      print(json.decode(response.body));
+      var responseData = json.decode(response.body);
+      if (responseData["error"] != null) {
+        throw responseData["error"]["message"];
+      }
     } catch (err) {
       rethrow;
     }

@@ -22,18 +22,28 @@ class _AuthPageState extends State<AuthPage> {
 
   Future<String?> _authUser(LoginData data) {
     debugPrint('Name: ${data.name}, Password: ${data.password}');
-    return Future.delayed(loginTime).then((_) {
-      Provider.of<AuthProvider>(context, listen: false)
-          .signIn(data.name, data.password);
+    return Future.delayed(loginTime).then((_) async {
+      try {
+        await Provider.of<AuthProvider>(context, listen: false).signIn(
+          data.name,
+          data.password,
+        );
+      } catch (err) {
+        return err.toString();
+      }
       return null;
     });
   }
 
   Future<String?> _signupUser(SignupData data) {
     debugPrint('Signup Name: ${data.name}, Password: ${data.password}');
-    return Future.delayed(loginTime).then((_) {
-      Provider.of<AuthProvider>(context, listen: false)
-          .signUp(data.name!, data.password!);
+    return Future.delayed(loginTime).then((_) async {
+      try {
+        await Provider.of<AuthProvider>(context, listen: false)
+            .signUp(data.name!, data.password!);
+      } catch (err) {
+        return err.toString();
+      }
       return null;
     });
   }
