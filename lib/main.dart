@@ -33,7 +33,21 @@ class MyApp extends StatelessWidget {
       builder: (context, child) => Consumer<AuthProvider>(
         builder: (context, auth, child) => MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: auth.isAuth ? const HomePage() : const AuthPage(),
+          home: auth.isAuth
+              ? const HomePage()
+              : FutureBuilder(
+                  future: auth.autoLogin(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Scaffold(
+                        body: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+                    return const AuthPage();
+                  },
+                ),
           routes: {
             AddProductPage.route: (ctx) => AddProductPage(),
             EditProductPage.route: (ctx) => const EditProductPage(),

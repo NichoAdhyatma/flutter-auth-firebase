@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider with ChangeNotifier {
   String idToken = "", userId = "";
@@ -13,10 +14,21 @@ class AuthProvider with ChangeNotifier {
 
   Timer? authTimer;
 
-  void tempData() {
+  Future<void> tempData() async {
     idToken = tempidToken;
     userId = tempuserId;
     expiredIn = tempexpiredIn;
+    final sharedPref = await SharedPreferences.getInstance();
+    final authTemp = json.encode(
+      {
+        'token': tempidToken,
+        'userId': tempuserId,
+        'expired': tempexpiredIn!.toIso8601String(),
+      },
+    );
+
+    sharedPref.setString('authData', authTemp);
+    autoLogout();
     notifyListeners();
   }
 
@@ -63,8 +75,6 @@ class AuthProvider with ChangeNotifier {
           ),
         ),
       );
-      autoLogout();
-      notifyListeners();
     } catch (err) {
       rethrow;
     }
@@ -101,14 +111,12 @@ class AuthProvider with ChangeNotifier {
           ),
         ),
       );
-      autoLogout();
-      notifyListeners();
     } catch (err) {
       rethrow;
     }
   }
 
-  void logout() {
+  void logout() async {
     userId = '';
     idToken = '';
     expiredIn = null;
@@ -116,6 +124,8 @@ class AuthProvider with ChangeNotifier {
       authTimer!.cancel();
       authTimer = null;
     }
+    final pref = await SharedPreferences.getInstance();
+    pref.clear();
 
     notifyListeners();
   }
@@ -125,10 +135,32 @@ class AuthProvider with ChangeNotifier {
       authTimer!.cancel();
     }
     final expired = tempexpiredIn!.difference(DateTime.now()).inSeconds;
-    print(expired);
+
     authTimer = Timer(
       Duration(seconds: expired),
       logout,
     );
+  }
+
+  Future<bool> autoLogin() async {
+    final sharedpref = await SharedPreferences.getInstance();
+    if (!sharedpref.containsKey('authData')) {
+      return false;
+    }
+
+    final authData = json.decode(sharedpref.get('authData').toString())
+        as Map<String, dynamic>;
+    final expiredTemp = DateTime.parse(authData["expired"]);
+
+    if (expiredTemp.isBefore(DateTime.now())) {
+      return false;
+    }
+
+    idToken = authData["token"];
+    userId = authData["userId"];
+    expiredIn = expiredTemp;
+
+    notifyListeners();
+    return true;
   }
 }
