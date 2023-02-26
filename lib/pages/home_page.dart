@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/providers/auth.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/products.dart';
@@ -65,8 +66,10 @@ class _HomePageState extends State<HomePage> {
         title: const Text("All Products"),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () => Navigator.pushNamed(context, AddProductPage.route),
+            onPressed: () {
+              Provider.of<AuthProvider>(context, listen: false).logout();
+            },
+            icon: const Icon(Icons.logout),
           ),
         ],
       ),
@@ -92,6 +95,12 @@ class _HomePageState extends State<HomePage> {
                     prov.allProduct[i].updatedAt,
                   ),
                 ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).pushNamed(AddProductPage.route);
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

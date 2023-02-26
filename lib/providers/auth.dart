@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,8 @@ class AuthProvider with ChangeNotifier {
 
   String tempidToken = "", tempuserId = "";
   DateTime? tempexpiredIn;
+
+  Timer? authTimer;
 
   void tempData() {
     idToken = tempidToken;
@@ -60,7 +63,7 @@ class AuthProvider with ChangeNotifier {
           ),
         ),
       );
-
+      autoLogout();
       notifyListeners();
     } catch (err) {
       rethrow;
@@ -98,10 +101,34 @@ class AuthProvider with ChangeNotifier {
           ),
         ),
       );
-
+      autoLogout();
       notifyListeners();
     } catch (err) {
       rethrow;
     }
+  }
+
+  void logout() {
+    userId = '';
+    idToken = '';
+    expiredIn = null;
+    if (authTimer != null) {
+      authTimer!.cancel();
+      authTimer = null;
+    }
+
+    notifyListeners();
+  }
+
+  void autoLogout() {
+    if (authTimer != null) {
+      authTimer!.cancel();
+    }
+    final expired = tempexpiredIn!.difference(DateTime.now()).inSeconds;
+    print(expired);
+    authTimer = Timer(
+      Duration(seconds: expired),
+      logout,
+    );
   }
 }

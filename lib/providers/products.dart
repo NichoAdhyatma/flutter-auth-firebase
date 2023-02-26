@@ -13,9 +13,10 @@ class Products with ChangeNotifier {
 
   String urlMaster = "https://flutter-auth-10063-default-rtdb.firebaseio.com";
 
-  String? token;
+  String? token, userId;
 
-  void getToken(tokenData) {
+  void getToken(tokenData, uid) {
+    userId = uid;
     token = tokenData;
     notifyListeners();
   }
@@ -31,6 +32,7 @@ class Products with ChangeNotifier {
           "price": price,
           "createdAt": dateNow.toString(),
           "updatedAt": dateNow.toString(),
+          "userId": userId,
         }),
       );
 
@@ -102,7 +104,9 @@ class Products with ChangeNotifier {
   }
 
   Future<void> inisialData() async {
-    Uri url = Uri.parse("$urlMaster/products.json?auth=$token");
+    Uri url = Uri.parse(
+        '$urlMaster/products.json?auth=$token&orderBy="userId"&equalTo="$userId"');
+    _allProduct.clear();
 
     try {
       var response = await http.get(url);
